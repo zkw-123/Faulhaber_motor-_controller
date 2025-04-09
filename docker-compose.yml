@@ -1,0 +1,31 @@
+version: '3'
+services:
+  faulhaber_motor_controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: faulhaber_motor_controller_image
+    container_name: faulhaber_motor_controller_container
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"  
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix 
+      - /home/zkw/BMPE/container_data/Faulhaber_Motor_Connect/data:/ros_ws/data
+      - /home/zkw/BMPE/container_data/Faulhaber_Motor_Connect/src:/ros_ws/src
+    networks:
+      - ros_network
+    command: >
+      /bin/bash -c "
+      source /opt/ros/foxy/setup.sh &&
+      colcon build &&
+      source /ros_ws/install/setup.sh &&
+      tail -f /dev/null
+      "
+
+networks:
+  ros_network:
+    driver: bridge
+
